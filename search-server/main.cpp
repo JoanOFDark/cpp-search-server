@@ -224,7 +224,8 @@ private:
             }
             const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
             for (const auto [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                if (key_mapper(document_id, documents_.at(document_id).status, documents_.at(document_id).rating)) {
+                const auto el = documents_.at(document_id);         //для избавления от поиска одного и того же объекта дважды ввел переменную el
+                if (key_mapper(document_id, el.status, el.rating)) {   //которой присваивается значение лишь единожды
                     document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 }
             }
