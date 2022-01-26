@@ -1,3 +1,4 @@
+///////////////////////////////
 ostream& operator<< (ostream& out, tuple<vector<string>, DocumentStatus> test) {    //перегружаем оператор вывода для корректной работы теста TestMatchDocument()
     tuple<vector<string>, DocumentStatus> t;
     if (test == t) {    //empty check
@@ -17,20 +18,45 @@ ostream& operator<< (ostream& out, tuple<vector<string>, DocumentStatus> test) {
     return out;
 }
 
+const double EXP = 1E-5;
+
 // -------- Начало модульных тестов поисковой системы ----------
 
 void TestAddDocument() {
-    const int doc_id = 23;
-    const string content = "pipi pupu papa popo"s;
-    const vector<int> ratings = { 1, 4, 8, 8 };
+    const int doc_id_1 = 23;
+    const string content_1 = "pipi pupu papa popo"s;
+    const vector<int> ratings_1 = { 1, 4, 8, 8 };
+
+    const int doc_id_2 = 33;
+    const string content_2 = "pipi papa"s;
+
+    const int doc_id_3 = 43;
+    const string content_3 = "pipi pupu"s;
 
     {
         SearchServer server;
-        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        server.AddDocument(doc_id_1, content_1, DocumentStatus::ACTUAL, ratings_1);
         const auto found_docs = server.FindTopDocuments("popo"s);
         ASSERT_EQUAL(found_docs.size(), 1u);
         const Document& doc0 = found_docs[0];
-        ASSERT_EQUAL(doc0.id, doc_id);
+        ASSERT_EQUAL(doc0.id, doc_id_1);
+    }
+
+    {
+        SearchServer server;
+        server.AddDocument(doc_id_2, content_2, DocumentStatus::ACTUAL, ratings_1);
+        server.AddDocument(doc_id_3, content_3, DocumentStatus::ACTUAL, ratings_1);
+        const auto found_docs1 = server.FindTopDocuments("papa"s);
+        ASSERT_EQUAL(found_docs1.size(), 1u);
+        const Document& doc0 = found_docs1[0];
+        ASSERT_EQUAL(doc0.id, doc_id_2);
+
+        const auto found_docs2 = server.FindTopDocuments("pipi"s);
+        ASSERT_EQUAL(found_docs2.size(), 2u);
+        const Document& doc_0 = found_docs2[0];
+        ASSERT_EQUAL(doc_0.id, doc_id_2);
+        const Document& doc_1 = found_docs2[1];
+        ASSERT_EQUAL(doc_1.id, doc_id_3);
     }
 }
 
@@ -102,7 +128,7 @@ void TestSortDocumentRelevance() {
     const int doc_id_3 = 43;
     const string content_3 = "pipi popo"s;
 
-    { 
+    {
         SearchServer server;
         server.AddDocument(doc_id_1, content_1, DocumentStatus::ACTUAL, ratings_1);
         server.AddDocument(doc_id_2, content_2, DocumentStatus::ACTUAL, ratings_1);
@@ -116,15 +142,37 @@ void TestSortDocumentRelevance() {
 }
 
 void TestComputeRating() {
-    const int doc_id = 23;
-    const string content = "pipi pupu papa popo"s;
-    const vector<int> ratings = { 1, 4, 8, 8 };
+    const int doc_id_1 = 23;
+    const string content_1 = "pipi pupu papa popo"s;
+    const vector<int> ratings_1 = { 1, 4, 8, 8 };
+
+    const int doc_id_2 = 33;
+    const string content_2 = "pipi pupu papa popo"s;
+    const vector<int> ratings_2 = { -1, -4, -8, -8 };
+
+    const int doc_id_3 = 43;
+    const string content_3 = "pipi pupu papa popo"s;
+    const vector<int> ratings_3 = { 1, 4, -8, -8 };
 
     {
         SearchServer server;
-        server.AddDocument(doc_id, content, DocumentStatus::ACTUAL, ratings);
+        server.AddDocument(doc_id_1, content_1, DocumentStatus::ACTUAL, ratings_1);
         const auto found_docs = server.FindTopDocuments("popo pupu"s);
         ASSERT_EQUAL(found_docs[0].rating, 5);
+    }
+
+    {
+        SearchServer server;
+        server.AddDocument(doc_id_2, content_2, DocumentStatus::ACTUAL, ratings_2);
+        const auto found_docs = server.FindTopDocuments("popo pupu"s);
+        ASSERT_EQUAL(found_docs[0].rating, -5);
+    }
+
+    {
+        SearchServer server;
+        server.AddDocument(doc_id_3, content_3, DocumentStatus::ACTUAL, ratings_3);
+        const auto found_docs = server.FindTopDocuments("popo pupu"s);
+        ASSERT_EQUAL(found_docs[0].rating, -2);
     }
 }
 
@@ -206,8 +254,8 @@ void TestComputeDocumentRelevance() {
         const auto found_docs_1 = server.FindTopDocuments("pipi"s);
         double t1 = 0.27031;
         double t2 = 0.135155;
-        ASSERT(abs(found_docs_1[0].relevance - t1) < 1E-5);
-        ASSERT(abs(found_docs_1[1].relevance - t2) < 1E-5);
+        ASSERT(abs(found_docs_1[0].relevance - t1) < EXP);
+        ASSERT(abs(found_docs_1[1].relevance - t2) < EXP);
     }
 }
 
