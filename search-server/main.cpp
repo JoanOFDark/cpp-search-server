@@ -106,11 +106,11 @@ public:
     void AddDocument(int document_id, const string& document, DocumentStatus status,
         const vector<int>& ratings) {
         if ((document_id < 0) || (documents_.count(document_id) > 0)) {
-            throw invalid_argument("Incorrect document_id"s);                   //redo
+            throw invalid_argument("Incorrect document_id"s);                   //redone
         }
         vector<string> words;
         if (!SplitIntoWordsNoStop(document, words)) {
-            throw invalid_argument("Incorrect symbols"s);                      //redo
+            throw invalid_argument("Incorrect symbols"s);                      //redone
         }
 
         const double inv_word_count = 1.0 / words.size();
@@ -125,7 +125,7 @@ public:
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
         Query query;
         if (!ParseQuery(raw_query, query)) {
-            throw invalid_argument("Incorrect query"s);             //redo
+            throw invalid_argument("Incorrect query"s);             //redone
         }
         auto matched_documents = FindAllDocuments(query, document_predicate);
 
@@ -163,17 +163,17 @@ public:
 
     int GetDocumentId(int index) const {
         if (index >= 0 && index < GetDocumentCount()) {
-            return document_ids_[index];            //redo
+            return document_ids_[index];            
         }
-        throw out_of_range("Incorrect index"s);
+        throw out_of_range("Incorrect index"s);             //redone
     }
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
         // Empty result by initializing it with default constructed tuple
         tuple<vector<string>, DocumentStatus> result = {};
         Query query;
-        if (!ParseQuery(raw_query, query)) {            //redo
-            throw invalid_argument("Incorrect query"s);
+        if (!ParseQuery(raw_query, query)) {            
+            throw invalid_argument("Incorrect query"s);         //redone
         }
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
