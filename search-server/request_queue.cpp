@@ -16,11 +16,6 @@ std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query,
 
 std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query)
 {
-    //const auto result = search_server_.FindTopDocuments(raw_query);
-    //AddRequest(result.size());
-    //return result;
-    
-    // Замечание исправлено, см. Fixes.txt
     return AddFindRequest(raw_query, DocumentStatus::ACTUAL);
 }
 
@@ -33,6 +28,7 @@ void RequestQueue::AddRequest(int results_num)
 {
     // новый запрос - новая минута
     ++current_time_;
+
     // удаляем все результаты поиска, которые устарели
     while (!requests_.empty() && min_in_day_ <= current_time_ - requests_.front().timestamp)
     {
@@ -42,6 +38,7 @@ void RequestQueue::AddRequest(int results_num)
         }
         requests_.pop_front();
     }
+
     // сохраняем новый результат поиска
     requests_.push_back({ current_time_, results_num });
     if (results_num == 0)

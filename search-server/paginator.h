@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 template<typename It>
 class IteratorRange {
     It begin_;

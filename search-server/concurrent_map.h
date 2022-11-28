@@ -61,8 +61,6 @@ public:
 
     auto Erase(const Key& key)
     {
-        //uint64_t tmp_key = static_cast<uint64_t>(key) % buckets_.size();
-        // Индексы uint, подавляем предупреждения о преобразованиях
         size_t tmp_key = static_cast<uint64_t>(key) % buckets_.size();
         std::lock_guard guard(buckets_[tmp_key].mutex);
         return buckets_[tmp_key].map.erase(key);

@@ -1,6 +1,6 @@
 #include "string_processing.h"
 
-// Функция преобразует разделенный пробелами текст в вектор строк-вью
+// Функция преобразует разделенный пробелами текст в вектор string_view
 std::vector<std::string_view> SplitIntoWordsView(std::string_view str_v)
 {
     using namespace std::string_literals;
@@ -11,7 +11,6 @@ std::vector<std::string_view> SplitIntoWordsView(std::string_view str_v)
     const int64_t pos_end = str_v.npos;
     while (true)
     {
-        // Убираем лидирующие пробелы
         while ((!str_v.empty()) && (str_v.front() == ' '))
         {
             str_v.remove_prefix(1);
@@ -25,7 +24,6 @@ std::vector<std::string_view> SplitIntoWordsView(std::string_view str_v)
         }
         else
         {
-            //pos = space + 1;
             str_v.remove_prefix(space + 1);
         }
     }

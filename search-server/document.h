@@ -1,6 +1,5 @@
 #pragma once
 
-// #include для type resolution в объявлениях функций:
 #include <iostream>
 
 struct Document

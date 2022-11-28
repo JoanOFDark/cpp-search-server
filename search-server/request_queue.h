@@ -1,8 +1,8 @@
 #pragma once
 
-// #include для type resolution в объявлениях функций:
 #include "search_server.h"
 #include "document.h"
+
 #include <vector>
 #include <string>
 #include <deque>

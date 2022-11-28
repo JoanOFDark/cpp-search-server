@@ -5,7 +5,6 @@
 #include "string_processing.h"
 #include "search_server.h"
 #include "read_input_functions.h"
-//#include "log_duration.h"
 
 
 SearchServer::SearchServer(const std::string& stop_words_text)  // Invoke delegating constructor
@@ -35,6 +34,7 @@ void SearchServer::AddDocument(int document_id, std::string_view document, Docum
     for (std::string_view word : words)
     {
         word_to_document_freqs_[word][document_id] += inv_word_count;
+
         // Заполняем дополнительный словарь для подсистемы поиска дубликатов (кэш подсистемы)
         document_to_words_[document_id][word] += inv_word_count;
     }
@@ -74,11 +74,11 @@ std::set<int>::const_iterator SearchServer::end() const
     return document_ids_.end();
 }
 
-// Создан bool-параметр
 SearchServer::Query SearchServer::ParseQuery(std::string_view text, bool sort_check = true) const
 {
     // Разбиваем запрос на слова
     const std::vector<std::string_view> query_words = SplitIntoWordsView(text);
+
     // Резервируем память только для плюс-слов
     SearchServer::Query result;
     result.plus_words.reserve(query_words.size());
@@ -178,6 +178,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
         [this, document_id](std::string_view word)
         {
             const auto it = word_to_document_freqs_.find(word);
+
             // Если минус слово есть среди слов сервера И в заданном документе это слово встечается (== 1)  => true
             return ((it != word_to_document_freqs_.end()) && (it->second.count(document_id)));
         })
@@ -193,10 +194,11 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
 
         // Пустой вектор совпавших слов
         std::vector<std::string_view> matched_words{};
+
         // Резервируем память (не более чем количество плюс-слов в запросе)
         matched_words.reserve(query.plus_words.size());
 
-        // Матчинг плюс-слов, версия 2 для последовательной реализации (другой словарь)
+        // Матчинг плюс-слов, версия 2 для последовательной реализации
         const auto& this_doc_words = document_to_words_.at(document_id);
         for (std::string_view word : query.plus_words)
         {
@@ -206,7 +208,7 @@ std::tuple<std::vector<std::string_view>, DocumentStatus> SearchServer::MatchDoc
             }
         }
 
-        // Удаляем дубликаты из результатов матчинга (версия для последовательной реализации)
+        // Удаляем дубликаты из результатов матчинга
         std::sort(std::execution::par, matched_words.begin(), matched_words.end());
         auto last = std::unique(std::execution::par, matched_words.begin(), matched_words.end());
         last = matched_words.erase(last, matched_words.end());
@@ -270,7 +272,7 @@ void SearchServer::Query::SortUniq(PlusMinusWords words)
     }
 }
 
-// Сортиров
+// Сортировка
 void SearchServer::Query::SortUniq()
 {
     SortUniq(PlusMinusWords::PLUS_WORDS);
@@ -279,7 +281,6 @@ void SearchServer::Query::SortUniq()
 
 bool SearchServer::IsStopWord(std::string_view word) const
 {
-    //return stop_words_.count(word.data()) > 0;
     return stop_words_.count(word) > 0;
 }
 

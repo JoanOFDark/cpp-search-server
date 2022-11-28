@@ -1,6 +1,5 @@
 #pragma once
 
-// #include дл€ type resolution в объ€влени€х функций:
 #include <string>
 #include <string_view>
 #include <algorithm>
@@ -70,8 +69,10 @@ public:
 
     using Match = std::tuple<std::vector<std::string_view>, DocumentStatus>;
     Match MatchDocument(std::string_view, int) const;
+
     // ¬ерси€ MatchDocument() дл€ политики последовательного выполнени€
     Match MatchDocument(std::execution::sequenced_policy, std::string_view, int);
+
     // ¬ерси€ MatchDocument() дл€ политики параллельного выполнени€
     Match MatchDocument(std::execution::parallel_policy, std::string_view, int);
 
@@ -117,13 +118,11 @@ private:
             MINUS_WORDS
         };
 
-        // ¬ыполн€ет сортировку и оставление уникальных значений в векторе (эмул€ци€ set).
+        // ¬ыполн€ет сортировку и оставление уникальных значений в векторе
         // PlusMinusWords::PLUS_WORDS дл€ сортировки плюс-слов, PlusMinusWords::MINUS_WORDS дл€ сортировки минус-слов
-        void SortUniq(PlusMinusWords pmw); //Ќе совсем пон€л как сделать один метод))
-                                           //сделать одно объ€вление и две перегрузки?
-                                           //или применить шаблон?
+        void SortUniq(PlusMinusWords pmw); 
 
-        //¬ыполн€ет сортировку и оставление уникальных значений в векторе (эмул€ци€ set).
+        //¬ыполн€ет сортировку и оставление уникальных значений в векторе
         void SortUniq();
     };
 
@@ -132,9 +131,9 @@ private:
     std::map<int, DocumentData> documents_;
     std::set<int> document_ids_;
 
-    //NEW
     // —ловарь "номер документа - словарь частоты его слов"
     std::map<int, std::map<std::string_view, double>> document_to_words_;
+
 
     bool IsStopWord(std::string_view) const;
 
@@ -155,11 +154,13 @@ private:
     std::vector<Document> FindAllDocuments(std::execution::sequenced_policy,
         const Query&,
         DocumentPredicate) const;
+
     // —пециализированный шаблон дл€ параллельного выполнени€
     template <typename DocumentPredicate>
     std::vector<Document> FindAllDocuments(std::execution::parallel_policy,
         const Query&,
         DocumentPredicate) const;
+
     // ¬ерси€ шаблона дл€ вызова без указани€ политики выполнени€ (вызывает seq-версию)
     template <typename DocumentPredicate>
     std::vector<Document> FindAllDocuments(const Query&,
@@ -167,8 +168,7 @@ private:
 };
 
 
-// ќпределени€ шаблонных методов (вынесены вне класса)
-
+// ќпределени€ шаблонных методов 
 template <typename StringContainer>
 SearchServer::SearchServer(const StringContainer& stop_words)
     : stop_words_(MakeUniqueNonEmptyStrings(stop_words))  // Extract non-empty stop words
@@ -328,7 +328,6 @@ std::vector<Document> SearchServer::FindAllDocuments(std::execution::parallel_po
             {
                 for (const auto [document_id, _] : word_to_document_freqs_.at(word))
                 {
-                    // Erase у ConcurrentMap потокобезопасный
                     document_to_relevance.Erase(document_id);
                 }
             }
@@ -368,12 +367,11 @@ void SearchServer::RemoveDocument(ExecutionPolicy&& policy, int document_id)
         words.begin(),
         [](const auto& word)
         {
-            // word - map<string, double>
-            //  ладем указатель на слово
             return &word.first;
         });
 
     std::mutex mutex_;
+
     // ”дал€ем слова, перебира€ указатели на них
     std::for_each(policy, words.begin(), words.end(),
         [this, document_id, &mutex_](const std::string* word)
