@@ -8,11 +8,11 @@
 #include <vector>
 using namespace std;
 string GenerateWord(mt19937& generator, int max_length) {
-    const int length = uniform_int_distribution(1, max_length)(generator);
+    const int length = uniform_int_distribution<>(1, max_length)(generator);
     string word;
     word.reserve(length);
     for (int i = 0; i < length; ++i) {
-        word.push_back(uniform_int_distribution('a', 'z')(generator));
+        word.push_back(uniform_int_distribution<>('a', 'z')(generator));
     }
     return word;
 }
