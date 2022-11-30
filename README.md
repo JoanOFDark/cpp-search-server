@@ -29,6 +29,7 @@ ratings - рэйтинг документа, каждый документ на 
 3) Поиск document в поисковом сервере. Например: search_server.FindTopDocuments("curly nasty cat"s)
 
 Пример использования кода: 
+
  SearchServer search_server("and with"s);
 
     for (
