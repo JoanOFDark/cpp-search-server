@@ -3,11 +3,19 @@
 
 Проект поискового сервера, осуществляющего поиск среди текстов документов с возможностью указания стоп-слов (игнорируются сервером), минус-слов (документы с ними не учитываются в выдаче)
 
+Системные требования:
+С++17 (STL);
+GCC (MinGW-w64) 11.2.0.
+
+Стек технологий:
+C++ stl
+
 Использование:
-Установка стоп-слов с помощью конструктора. Например: SearchServer search_server("and in at with"s); 
+
+1) Установка стоп-слов с помощью конструктора. Например: SearchServer search_server("and in at with"s); 
 Стоп-слово в запросе не учитывается при поиске.
 
-Добавление документов в поисковую систему. Например: search_server.AddDocument(1, "funny pet and nasty -rat"s, DocumentStatus::ACTUAL, { 5, -12, 2, 1 });
+2) Добавление документов в поисковую систему. Например: search_server.AddDocument(1, "funny pet and nasty -rat"s, DocumentStatus::ACTUAL, { 5, -12, 2, 1 });
 Объявление метода: void AddDocument(int document_id, string_view document, DocumentStatus status, const vector<int> &ratings);
 document_id - id документа
 document - строка. Например: "funny pet and nasty -rat"s,
@@ -18,7 +26,7 @@ status - статус документа. Возможный DocumentStatus: ACT
 ratings - рэйтинг документа, каждый документ на входе имеет набор оценок пользователей.
 Первая цифра — это количество оценок, например:{4 5 -12 2 1};
 
-Поиск document в поисковом сервере. Например: search_server.FindTopDocuments("curly nasty cat"s)
+3) Поиск document в поисковом сервере. Например: search_server.FindTopDocuments("curly nasty cat"s)
 
 Пример использования кода: 
  SearchServer search_server("and with"s);
@@ -49,20 +57,23 @@ ratings - рэйтинг документа, каждый документ на 
     }
     
 Вывод: 
+
 ACTUAL by default:
+
 { document_id = 1, relevance = 0.346574, rating = -1 }
+
 { document_id = 4, relevance = 0.095894, rating = -1 }
+
 { document_id = 2, relevance = 0.0719205, rating = -1 }
+
 { document_id = 3, relevance = 0.0719205, rating = -1 }
+
 BANNED:
+
 Even ids:
+
 { document_id = 4, relevance = 0.095894, rating = -1 }
+
 { document_id = 2, relevance = 0.0719205, rating = -1 }
     
 
-Системные требования:
-С++17 (STL);
-GCC (MinGW-w64) 11.2.0.
-
-Стек технологий:
-C++ stl
