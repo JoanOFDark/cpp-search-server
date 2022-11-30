@@ -20,6 +20,46 @@ ratings - рэйтинг документа, каждый документ на 
 
 Поиск document в поисковом сервере. Например: search_server.FindTopDocuments("curly nasty cat"s)
 
+Пример использования кода: 
+ SearchServer search_server("and with"s);
+
+    for (
+        int id = 0;
+        const string & text : {
+        "white cat and yellow hat"s, "funny pet and nasty -rat"s, "nasty dog with big eyes"s, "nasty pigeon john"s,
+        }
+    ) 
+    {
+        search_server.AddDocument(++id, text, DocumentStatus::ACTUAL, { 5, -12, 2, 1 });
+    }
+    cout << "ACTUAL by default:"s << endl;
+    // последовательная версия
+    for (const Document& document : search_server.FindTopDocuments("curly nasty cat"s)) {
+        PrintDocument(document);
+    }
+    cout << "BANNED:"s << endl;
+    // последовательная версия
+    for (const Document& document : search_server.FindTopDocuments(execution::seq, "curly nasty cat"s, DocumentStatus::BANNED)) {
+        PrintDocument(document);
+    }
+    cout << "Even ids:"s << endl;
+    // параллельная версия
+    for (const Document& document : search_server.FindTopDocuments(execution::par, "curly nasty cat"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
+        PrintDocument(document);
+    }
+    
+Вывод: 
+ACTUAL by default:
+{ document_id = 1, relevance = 0.346574, rating = -1 }
+{ document_id = 4, relevance = 0.095894, rating = -1 }
+{ document_id = 2, relevance = 0.0719205, rating = -1 }
+{ document_id = 3, relevance = 0.0719205, rating = -1 }
+BANNED:
+Even ids:
+{ document_id = 4, relevance = 0.095894, rating = -1 }
+{ document_id = 2, relevance = 0.0719205, rating = -1 }
+    
+
 Системные требования:
 С++17 (STL);
 GCC (MinGW-w64) 11.2.0.
